@@ -85,11 +85,7 @@ Before you begin, ensure you have the following installed:
    ```bash
    npm run preview
    ```
-
-## 📁 Project Structure
-
-```
-
+   
 ## 🔑 Key Features Explained
 
 ### Authentication
@@ -146,5 +142,3 @@ For questions or support, please contact [your.email@example.com](mailto:your.em
 - [ ] Push notifications
 - [ ] Dark/light theme toggle
 - [ ] Message encryption
-
----
