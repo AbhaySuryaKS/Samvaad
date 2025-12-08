@@ -119,7 +119,7 @@ This project is licensed under the MIT License
 
 ## 👥 Authors
 
-- Abhay Surya K S-
+- Abhay Surya K S
 
 ## 🙏 Acknowledgments
 
