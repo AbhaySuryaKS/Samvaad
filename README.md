@@ -128,10 +128,6 @@ This project is licensed under the MIT License
 - Tailwind CSS for styling
 - React community for excellent documentation
 
-## 📧 Contact
-
-For questions or support, please contact [your.email@example.com](mailto:your.email@example.com)
-
 ## 🔮 Future Enhancements
 
 - [ ] Group chat functionality
