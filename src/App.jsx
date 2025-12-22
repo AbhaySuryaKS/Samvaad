@@ -1,5 +1,5 @@
 import { Navigate, Route, Router, Routes } from "react-router-dom";
-import ChatPage from "./pages/ChatPage.jsx";
+import ChatPage from "./pages/chatPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import AuthPage from "./pages/authPage.jsx";
 import 'react-toastify/dist/ReactToastify.css';
