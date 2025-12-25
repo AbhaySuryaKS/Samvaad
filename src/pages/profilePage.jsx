@@ -18,8 +18,11 @@ function ProfilePage() {
 
     useEffect(() => {
         const fetchUserData = async () => {
+            console.log("Starting to fetch user data...");
             try {
                 const data = await getUserData();
+                console.log("Fetched user data:", data);
+                
                 if (data) {
                     setUserData(data);
                     setUserImage(data.avatar || null);
@@ -28,10 +31,16 @@ function ProfilePage() {
                     setEmail(data.email || "");
                     setUsername(data.username || "");
                     setUserId(data.userId || "");
+                    console.log("User data set successfully");
+                } else {
+                    console.log("No user data returned");
+                    toast.error("No user data found. Please log in again.");
                 }
-            } catch {
-                toast.error("Failed to fetch user data.");
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                toast.error("Failed to fetch user data: " + error.message);
             } finally {
+                console.log("Setting loading to false");
                 setLoading(false);
             }
         };
@@ -41,18 +50,23 @@ function ProfilePage() {
     const logoutUserAccount = async () => {
         try {
             await logoutUser();
-            toast.success("LoggedOut Successfully.");
-        } catch {
-            toast.error("Error Loggingout.");
+            toast.success("Logged Out Successfully.");
+        } catch (error) {
+            console.error("Logout error:", error);
+            toast.error("Error Logging out.");
         }
     }
 
     const deleteUserAccount = async () => {
+        const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+        if (!confirmed) return;
+        
         try {
             await deleteAccount();
             toast.success("Account Deleted Successfully.");
             setTimeout(() => window.location.reload(), 2000);
-        } catch {
+        } catch (error) {
+            console.error("Delete account error:", error);
             toast.error("Error Deleting Account!\nTry again after logout and login.");
         }
     }
@@ -60,6 +74,16 @@ function ProfilePage() {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                toast.error("Please select an image file");
+                return;
+            }
+            // Validate file size (e.g., max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error("Image size should be less than 5MB");
+                return;
+            }
             setFileToUpload(file);
             setPreviewURL(URL.createObjectURL(file));
         } else {
@@ -71,6 +95,7 @@ function ProfilePage() {
     const handleUpdate = async (e) => {
         e.preventDefault();
         const finalName = name.trim();
+        
         if (!userData) {
             toast.error("No user found.");
             return;
@@ -84,10 +109,13 @@ function ProfilePage() {
             let imageUrl = userImage;
             
             if (fileToUpload) {
+                toast.info("Uploading image...");
                 imageUrl = await uploadMedia(fileToUpload, 'image');
+                console.log("Image uploaded:", imageUrl);
             }
             
-            await updateProfile(name, bio, imageUrl);
+            toast.info("Updating profile...");
+            await updateProfile(finalName, bio, imageUrl);
             setUserImage(imageUrl); 
             setFileToUpload(null);
             setPreviewURL(null); 
@@ -95,24 +123,52 @@ function ProfilePage() {
             toast.success("Profile updated successfully!");
             setTimeout(() => window.location.reload(), 2000); 
         } catch (error) {
-            console.error(error);
-            toast.error("Something went wrong with the update or image upload!");
+            console.error("Update error:", error);
+            toast.error("Something went wrong: " + error.message);
         }
     };
+
+    // Clean up preview URL on unmount
+    useEffect(() => {
+        return () => {
+            if (previewURL) {
+                URL.revokeObjectURL(previewURL);
+            }
+        };
+    }, [previewURL]);
 
     if (loading) {
         return (
             <>
+                <NavBar />
                 <div className="flex justify-center items-center min-h-screen bg-gray-900 text-gray-100">
-                    <div className="flex justify-center items-center min-h-screen bg-gray-900 text-gray-100">
-                        <div className="relative flex justify-center items-center w-24 h-24">
-                            <div className="absolute w-full h-full animate-spin-slow"> 
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-indigo-500 rounded-full blur-md"></div>
-                                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-pink-500 rounded-full blur-md"></div>
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-purple-500 rounded-full blur-md"></div>
-                                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-sky-500 rounded-full blur-md"></div>
-                            </div>
+                    <div className="relative flex justify-center items-center w-24 h-24">
+                        <div className="absolute w-full h-full animate-spin">
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-indigo-500 rounded-full blur-md"></div>
+                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-pink-500 rounded-full blur-md"></div>
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-purple-500 rounded-full blur-md"></div>
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-sky-500 rounded-full blur-md"></div>
                         </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+    if (!loading && !userData) {
+        return (
+            <>
+                <NavBar />
+                <div className="flex justify-center items-center min-h-screen bg-linear-to-br from-gray-900 via-gray-900 to-black text-gray-100">
+                    <div className="text-center">
+                        <h2 className="text-2xl font-bold mb-4">Unable to load profile</h2>
+                        <p className="text-gray-400 mb-6">Please try logging in again</p>
+                        <button 
+                            onClick={() => window.location.href = '/login'} 
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg"
+                        >
+                            Go to Login
+                        </button>
                     </div>
                 </div>
             </>
@@ -131,14 +187,19 @@ function ProfilePage() {
                                 src={previewURL || userImage || "https://placehold.co/112x112/2d3748/a0aec0?text=Avatar"}
                                 alt="Profile Avatar"
                                 className="w-28 h-28 object-cover rounded-full border-4 border-indigo-600 shadow-lg"
-                                onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/112x112/2d3748/a0aec0?text=Avatar"; }}
+                                onError={(e) => { 
+                                    e.target.onerror = null; 
+                                    e.target.src = "https://placehold.co/112x112/2d3748/a0aec0?text=Avatar"; 
+                                }}
                             />
                             <label
                                 htmlFor="photo"
                                 className="absolute -bottom-2 -right-2 bg-indigo-600 p-2 rounded-full cursor-pointer border-2 border-gray-800 hover:bg-indigo-700 transition-colors flex items-center justify-center"
                                 title="Change Photo"
                             >
-                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L16.732 3.732z" /></svg>
+                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L16.732 3.732z" />
+                                </svg>
                                 <input
                                     type="file"
                                     id="photo"
@@ -151,13 +212,16 @@ function ProfilePage() {
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div className="bg-gray-700 p-3 rounded-lg overflow-hidden text-ellipsis">
-                                <span className="font-semibold text-gray-400">Username: </span> {Username}
+                                <span className="font-semibold text-gray-400">Username: </span> 
+                                <span>{Username || 'N/A'}</span>
                             </div>
                             <div className="bg-gray-700 p-3 rounded-lg overflow-hidden text-ellipsis">
-                                <span className="font-semibold text-gray-400">Email: </span> {email}
+                                <span className="font-semibold text-gray-400">Email: </span> 
+                                <span>{email || 'N/A'}</span>
                             </div>
                             <div className="bg-gray-700 p-3 rounded-lg col-span-1 md:col-span-2 overflow-hidden text-ellipsis">
-                                <span className="font-semibold text-gray-400">User ID: </span> {UserId}
+                                <span className="font-semibold text-gray-400">User ID: </span> 
+                                <span>{UserId || 'N/A'}</span>
                             </div>
                         </div>
 
@@ -169,6 +233,7 @@ function ProfilePage() {
                                 className='w-full bg-gray-700 text-white p-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500'
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
+                                required
                             />
                         </div>
 
@@ -178,8 +243,9 @@ function ProfilePage() {
                                 id="bio"
                                 value={bio}
                                 placeholder='Tell us about yourself...'
-                                className='w-full min-h-3 bg-gray-700 text-white p-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500'
+                                className='w-full min-h-24 bg-gray-700 text-white p-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y'
                                 onChange={(e) => setBio(e.target.value)}
+                                rows={3}
                             />
                         </div>
 
