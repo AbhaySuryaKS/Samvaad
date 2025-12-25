@@ -21,16 +21,18 @@ export default function ChatPage() {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-screen bg-gray-900 text-gray-100">
-                <div className="relative flex justify-center items-center w-24 h-24">
-                    <div className="absolute w-full h-full animate-spin-slow">
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-indigo-500 rounded-full blur-md"></div>
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-pink-500 rounded-full blur-md"></div>
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-purple-500 rounded-full blur-md"></div>
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-sky-500 rounded-full blur-md"></div>
+            <>
+                <div className="flex justify-center items-center min-h-screen bg-gray-900 text-gray-100">
+                    <div className="relative flex justify-center items-center w-24 h-24">
+                        <div className="absolute w-full h-full animate-spin"> {/* Changed to animate-spin */}
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-indigo-500 rounded-full blur-md"></div>
+                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-pink-500 rounded-full blur-md"></div>
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-purple-500 rounded-full blur-md"></div>
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-sky-500 rounded-full blur-md"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </>
         );
     }
 
