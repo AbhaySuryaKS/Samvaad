@@ -3,6 +3,9 @@
 A modern, real-time chat application built with React, Firebase, and Tailwind CSS. Samvaad enables users to connect and communicate seamlessly with a beautiful, responsive interface.
 
 ![Samvaad Logo](./public/AppLogo.jpg)
+![1765219344693](https://github.com/user-attachments/assets/d94a2e62-076a-48a1-8440-6e2cbace088e)
+![1765219344953](https://github.com/user-attachments/assets/65b0191e-33d2-4ccb-8cda-61078299e241)
+![1765219344474](https://github.com/user-attachments/assets/7ec2f6a4-c4e4-41af-8578-869f60e4a97c)
 
 ## ✨ Features
 
